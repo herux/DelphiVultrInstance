@@ -1,4 +1,5 @@
 inherited Form2_Windows: TForm2_Windows
+  Caption = 'VULTR Instances API'
   DesignerMasterStyle = 1
   inherited TabControl1: TTabControl
     TabOrder = 0
@@ -7,6 +8,7 @@ inherited Form2_Windows: TForm2_Windows
       309s)
     inherited TabItem1: TTabItem
       Size.Width = 638.000000000000000000
+      Text = 'VULTR Instances'
       ExplicitSize.cx = 213.000000000000000000
       ExplicitSize.cy = 24.000000000000000000
       inherited Label1: TLabel
@@ -14,6 +16,9 @@ inherited Form2_Windows: TForm2_Windows
         inherited Button1: TButton
           OnClick = nil
         end
+      end
+      inherited Label32: TLabel
+        Text = ''
       end
       inherited Layout25: TLayout
         inherited Label17: TLabel
@@ -47,7 +52,7 @@ inherited Form2_Windows: TForm2_Windows
   end
   inherited edtPAT: TEdit
     TabOrder = 5
-    OnKeyDown = nil
+    OnKeyDown = edtPATKeyDown
   end
   inherited RESTClient1: TRESTClient
     Left = 392
