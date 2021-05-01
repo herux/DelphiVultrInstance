@@ -4,6 +4,7 @@ object Form2: TForm2
   Caption = 'Form2'
   ClientHeight = 480
   ClientWidth = 640
+  Position = Designed
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
@@ -55651,7 +55652,7 @@ object Form2: TForm2
       Size.PlatformDefault = False
       StyleLookup = ''
       TabOrder = 0
-      Text = 'Droplets'
+      Text = 'Instances'
       ExplicitSize.cx = 213.000000000000000000
       ExplicitSize.cy = 24.000000000000000000
       object Label1: TLabel
@@ -55667,7 +55668,6 @@ object Form2: TForm2
         Size.Height = 28.000000000000000000
         Size.PlatformDefault = False
         TextSettings.Font.StyleExt = {00070000000000000004000000}
-        Text = 'Droplets'
         TabOrder = 1
         object Button1: TButton
           Align = Right
@@ -55678,6 +55678,7 @@ object Form2: TForm2
           StyleLookup = 'additembutton'
           TabOrder = 0
           Text = 'Button1'
+          OnClick = Button1Click
         end
         object Button2: TButton
           Align = Right
@@ -55723,28 +55724,12 @@ object Form2: TForm2
           end
         end
       end
-      object Label32: TLabel
-        Align = Bottom
-        Margins.Left = 3.000000000000000000
-        Margins.Top = 3.000000000000000000
-        Margins.Right = 3.000000000000000000
-        Margins.Bottom = 3.000000000000000000
-        Position.X = 3.000000000000000000
-        Position.Y = 289.000000000000000000
-        Size.Width = 634.000000000000000000
-        Size.Height = 17.000000000000000000
-        Size.PlatformDefault = False
-        Text = 
-          'Create cloud servers on the fly with the DigitalOcean API in Del' +
-          'phi.'
-        TabOrder = 2
-      end
       object Layout25: TLayout
         Align = Client
         Size.Width = 640.000000000000000000
-        Size.Height = 248.000000000000000000
+        Size.Height = 271.000000000000000000
         Size.PlatformDefault = False
-        TabOrder = 3
+        TabOrder = 2
         object Label17: TLabel
           Align = Top
           StyledSettings = [Family, Size, FontColor]
@@ -55760,7 +55745,7 @@ object Form2: TForm2
         object ListBox13: TListBox
           Align = Client
           Size.Width = 640.000000000000000000
-          Size.Height = 231.000000000000000000
+          Size.Height = 254.000000000000000000
           Size.PlatformDefault = False
           TabOrder = 1
           AlternatingRowBackground = True
@@ -55769,7 +55754,7 @@ object Form2: TForm2
           DefaultItemStyles.GroupHeaderStyle = ''
           DefaultItemStyles.GroupFooterStyle = ''
           Viewport.Width = 636.000000000000000000
-          Viewport.Height = 227.000000000000000000
+          Viewport.Height = 250.000000000000000000
         end
       end
       object Layout3D1: TLayout3D
@@ -55971,7 +55956,7 @@ object Form2: TForm2
       TextSettings.Font.Size = 48.000000000000000000
       TextSettings.Font.StyleExt = {00070000000000000004000000}
       TextSettings.VertAlign = Trailing
-      Text = 'DigitalOcean'
+      Text = 'VULTR'
       TabOrder = 0
       object Label11: TLabel
         Align = Center
@@ -55984,7 +55969,7 @@ object Form2: TForm2
         TextSettings.Font.Size = 24.000000000000000000
         TextSettings.Font.StyleExt = {00070000000000000004000000}
         TextSettings.VertAlign = Leading
-        Text = 'Droplets'
+        Text = 'Instances'
         TabOrder = 0
       end
     end
@@ -55998,6 +55983,7 @@ object Form2: TForm2
     Size.Height = 22.000000000000000000
     Size.PlatformDefault = False
     TextPrompt = 'Your Personal Access Token'
+    OnKeyDown = edtPATKeyDown
   end
   object RESTClient1: TRESTClient
     Params = <>

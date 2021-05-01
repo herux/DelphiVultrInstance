@@ -10,9 +10,6 @@ inherited Form2_Macintosh: TForm2_Macintosh
       ExplicitSize.cy = 24.000000000000000000
       inherited Label1: TLabel
         TextSettings.Font.StyleExt = {00070000000000000004000000}
-        inherited Button1: TButton
-          OnClick = nil
-        end
       end
       inherited Layout25: TLayout
         inherited Label17: TLabel
@@ -20,7 +17,7 @@ inherited Form2_Macintosh: TForm2_Macintosh
         end
         inherited ListBox13: TListBox
           Viewport.Width = 636.000000000000000000
-          Viewport.Height = 227.000000000000000000
+          Viewport.Height = 250.000000000000000000
         end
       end
     end
@@ -43,6 +40,5 @@ inherited Form2_Macintosh: TForm2_Macintosh
   end
   inherited edtPAT: TEdit
     TabOrder = 5
-    OnKeyDown = nil
   end
 end

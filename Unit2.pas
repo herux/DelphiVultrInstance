@@ -21,7 +21,6 @@ type
     Rectangle2: TRectangle;
     Edit1: TEdit;
     SearchEditButton1: TSearchEditButton;
-    Label32: TLabel;
     Layout25: TLayout;
     Label17: TLabel;
     ListBox13: TListBox;
@@ -37,6 +36,7 @@ type
     procedure DoTrashButtonClick(Sender: TObject);
     procedure edtPATKeyDown(Sender: TObject; var Key: Word; var KeyChar: Char;
       Shift: TShiftState);
+    procedure Button1Click(Sender: TObject);
   private
    FPersonalAccessToken: string;
     { Private declarations }
@@ -53,7 +53,7 @@ type
   end;
 
 const
-  VULTR_INSTANCE_BASE_PATH = 'https://api.vultr.com/v2';
+  VULTR_API_BASE_PATH = 'https://api.vultr.com/v2';
 var
   Form2: TForm2;
 
@@ -65,13 +65,47 @@ implementation
 
 { TForm2 }
 
-function TForm2.CreateInstance: String;
+procedure TForm2.Button1Click(Sender: TObject);
 begin
-
+  CreateInstance;
 end;
 
-function TForm2.CreateListBoxItem(AIndex: integer; AId,
-  AName: string): TListBoxItem;
+function TForm2.CreateInstance: String;
+var
+  LRestClient: TRESTClient;
+  LRestRequest: TRESTRequest;
+  LReqBody, LResp: TJSONObject;
+  LItemLB: TListBoxItem;
+begin
+  LRestClient := TRESTClient.Create(VULTR_API_BASE_PATH + '/instances');
+  LRestRequest:= TRESTRequest.Create(nil);
+  LReqBody :=  TJSONObject.Create;
+  try
+    // creating new instance req body
+    LReqBody.AddPair('region','ewr');
+    LReqBody.AddPair('plan','vc2-6c-16gb');
+    LReqBody.AddPair('label','Example Instance'); //'VULTR.Delphi'+ListBox13.Count.ToString+'.Instance'
+    LReqBody.AddPair('os_id', TJSONNumber.Create(215));
+    LReqBody.AddPair('user_data','QmFzZTY0IEV4YW1wbGUgRGF0YQ');
+    LReqBody.AddPair('backups','enabled');
+
+    LRestRequest.Method := rmPOST;
+    LRestRequest.AddParameter('Authorization', 'Bearer ' + PersonalAccessToken, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
+    LRestRequest.AddBody(LReqBody.ToJSON, TRESTContentType.ctAPPLICATION_JSON);
+    LRestRequest.Client := LRestClient;
+    LRestRequest.Execute;
+    LResp := (LRestRequest.Response.JSONValue as TJSONObject).GetValue('instance') as TJSONObject;
+    LItemLB := CreateListBoxItem(ListBox13.Count, LResp.GetValue('id').Value, LResp.GetValue('label').Value);
+    ListBox13.AddObject(LItemLB);
+    Result := LRestRequest.Response.JSONText;
+  finally
+    LRestRequest.Free;
+    LRestClient.Free;
+    LReqBody.Free;
+  end;
+end;
+
+function TForm2.CreateListBoxItem(AIndex: integer; AId: string; AName: string): TListBoxItem;
 var
   vLayout: TLayout;
   vBtnTrash: TButton;
@@ -103,8 +137,27 @@ begin
 end;
 
 procedure TForm2.DeleteInstance(AnInstanceID: string; AItemIndex: integer);
+var
+  LRestClient: TRESTClient;
+  LRestRequest: TRESTRequest;
 begin
-
+  LRestClient := TRESTClient.Create(VULTR_API_BASE_PATH + '/instances/' + AnInstanceID);
+  LRestRequest:= TRESTRequest.Create(nil);
+  try
+    try
+      LRestRequest.Method := rmDELETE;
+      LRestRequest.AddParameter('Authorization', 'Bearer ' + PersonalAccessToken, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
+      LRestRequest.Client := LRestClient;
+      LRestRequest.Execute;
+      ListBox13.Items.Delete(AItemIndex);
+    except
+      on E:Exception do
+        ShowMessage('Delete instance failed');
+    end;
+  finally
+    LRestRequest.Free;
+    LRestClient.Free;
+  end;
 end;
 
 procedure TForm2.DoTrashButtonClick(Sender: TObject);
@@ -126,12 +179,12 @@ var
   LRestRequest: TRESTRequest;
   LDroplets: TJSONArray;
   I: Integer;
-  LLBDroplet: TListBoxItem;
+  LLBInstance: TListBoxItem;
   LLayout: TLayout;
   LBtnTrash: TButton;
   LDroplLabel: TLabel;
 begin
-  LRestClient := TRESTClient.Create(VULTR_INSTANCE_BASE_PATH + '/instances');
+  LRestClient := TRESTClient.Create(VULTR_API_BASE_PATH + '/instances');
   LRestRequest:= TRESTRequest.Create(nil);
   try
     LRestRequest.Method := rmGET;
@@ -142,10 +195,10 @@ begin
     LDroplets := Result.GetValue('instances') as TJSONArray;
     I := 0;
     for I := 0 to LDroplets.Count - 1 do begin
-      LLBDroplet := CreateListBoxItem(I,
+      LLBInstance := CreateListBoxItem(I,
         (LDroplets.Items[I] as TJSONObject).GetValue('id').Value,
-        (LDroplets.Items[I] as TJSONObject).GetValue('name').Value);
-      ListBox13.AddObject(LLBDroplet);
+        (LDroplets.Items[I] as TJSONObject).GetValue('label').Value);
+      ListBox13.AddObject(LLBInstance);
     end;
     PersonalAccessToken := edtPAT.Text;
     edtPAT.Visible := False;
@@ -156,8 +209,30 @@ begin
 end;
 
 function TForm2.InstanceCommand(AnInstanceID, ACommand: string): boolean;
+var
+  LRestClient: TRESTClient;
+  LRestRequest: TRESTRequest;
+  LReqBody, LResp: TJSONObject;
+  LItemLB: TListBoxItem;
 begin
-
+  LRestClient := TRESTClient.Create(VULTR_API_BASE_PATH + '/instances/'+AnInstanceID+'/'+ACommand);
+  LRestRequest:= TRESTRequest.Create(nil);
+  LReqBody :=  TJSONObject.Create;
+  try
+    LRestRequest.Method := rmPOST;
+    LRestRequest.AddParameter('Authorization', 'Bearer ' + PersonalAccessToken, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
+    LRestRequest.AddBody(LReqBody.ToJSON, TRESTContentType.ctAPPLICATION_JSON);
+    LRestRequest.Client := LRestClient;
+    LRestRequest.Execute;
+    LResp := (LRestRequest.Response.JSONValue as TJSONObject).GetValue('instance') as TJSONObject;
+    LItemLB := CreateListBoxItem(ListBox13.Count, LResp.GetValue('id').Value, LResp.GetValue('label').Value);
+    ListBox13.AddObject(LItemLB);
+    Result := LRestRequest.Response.JSONText;
+  finally
+    LRestRequest.Free;
+    LRestClient.Free;
+    LReqBody.Free;
+  end;
 end;
 
 end.

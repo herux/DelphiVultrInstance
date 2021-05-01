@@ -13,12 +13,6 @@ inherited Form2_Windows: TForm2_Windows
       ExplicitSize.cy = 24.000000000000000000
       inherited Label1: TLabel
         TextSettings.Font.StyleExt = {00070000000000000004000000}
-        inherited Button1: TButton
-          OnClick = nil
-        end
-      end
-      inherited Label32: TLabel
-        Text = ''
       end
       inherited Layout25: TLayout
         inherited Label17: TLabel
@@ -26,7 +20,7 @@ inherited Form2_Windows: TForm2_Windows
         end
         inherited ListBox13: TListBox
           Viewport.Width = 636.000000000000000000
-          Viewport.Height = 227.000000000000000000
+          Viewport.Height = 250.000000000000000000
         end
       end
     end
@@ -46,13 +40,11 @@ inherited Form2_Windows: TForm2_Windows
       inherited Label11: TLabel
         Size.Width = 593.000000000000000000
         TextSettings.Font.StyleExt = {00070000000000000004000000}
-        Text = 'Instances'
       end
     end
   end
   inherited edtPAT: TEdit
     TabOrder = 5
-    OnKeyDown = edtPATKeyDown
   end
   inherited RESTClient1: TRESTClient
     Left = 392
