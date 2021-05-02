@@ -34,6 +34,9 @@ type
     RESTClient1: TRESTClient;
     RESTRequest1: TRESTRequest;
     procedure DoTrashButtonClick(Sender: TObject);
+    procedure DoRebootButtonClick(Sender: TObject);
+    procedure DoStartButtonClick(Sender: TObject);
+    procedure DoReinstallButtonClick(Sender: TObject);
     procedure edtPATKeyDown(Sender: TObject; var Key: Word; var KeyChar: Char;
       Shift: TShiftState);
     procedure Button1Click(Sender: TObject);
@@ -44,7 +47,7 @@ type
     procedure DeleteInstance(AnInstanceID: string;  AItemIndex: integer);
     function GetAllInstance(APage: integer): TJSONObject;
 
-    function InstanceCommand(AnInstanceID: string; ACommand: string): boolean;
+    function InstanceCommand(AnInstanceID: string; ACommand: string; AData: TJSONObject = nil): boolean;
 
     function CreateListBoxItem(AIndex: integer; AId: string; AName: string): TListBoxItem;
   public
@@ -84,7 +87,7 @@ begin
     // creating new instance req body
     LReqBody.AddPair('region','ewr');
     LReqBody.AddPair('plan','vc2-6c-16gb');
-    LReqBody.AddPair('label','Example Instance'); //'VULTR.Delphi'+ListBox13.Count.ToString+'.Instance'
+    LReqBody.AddPair('label','VULTR.Delphi'+ListBox13.Count.ToString+'.Instance');
     LReqBody.AddPair('os_id', TJSONNumber.Create(215));
     LReqBody.AddPair('user_data','QmFzZTY0IEV4YW1wbGUgRGF0YQ');
     LReqBody.AddPair('backups','enabled');
@@ -107,33 +110,74 @@ end;
 
 function TForm2.CreateListBoxItem(AIndex: integer; AId: string; AName: string): TListBoxItem;
 var
-  vLayout: TLayout;
-  vBtnTrash: TButton;
-  vDroplLabel: TLabel;
+  LLayout: TLayout;
+  LBtnTrash, LBtnReboot, LBtnStart, LBtnReinstall: TButton;
+  LDroplLabel: TLabel;
 begin
   Result := TListBoxItem.Create(ListBox13);
-  vLayout := TLayout.Create(nil);
-  vLayout.Align := TAlignLayout.Top;
-  vLayout.Size.Height := 19;
-  vLayout.Size.PlatformDefault := False;
-  vLayout.Size.Width := 636;
-  vBtnTrash:= TButton.Create(vLayout);
-  vBtnTrash.StyleLookup := 'trashtoolbutton';
-  vBtnTrash.Anchors := [TAnchorKind.akTop, TAnchorKind.akRight, TAnchorKind.akBottom];
-  vBtnTrash.Align := TAlignLayout.Right;
-  vBtnTrash.ControlType := TControlType.Styled;
-  vBtnTrash.Size.Height := 35;
-  vBtnTrash.Size.PlatformDefault := False;
-  vBtnTrash.Size.Width := 35;
-  vBtnTrash.OnClick := DoTrashButtonClick;
-  vBtnTrash.Tag := index;
-  vBtnTrash.TagString := AId;
-  vLayout.AddObject(vBtnTrash);
-  vDroplLabel := TLabel.Create(vLayout);
-  vDroplLabel.Align := TAlignLayout.Client;
-  vDroplLabel.Text := AName;
-  vLayout.AddObject(vDroplLabel);
-  Result.AddObject(vLayout);
+  Result.Height := 40;
+  LLayout := TLayout.Create(nil);
+  LLayout.Align := TAlignLayout.Top;
+  LLayout.Size.Height := 40;
+  LLayout.Size.PlatformDefault := False;
+  LLayout.Size.Width := 636;
+  // delete instance
+  LBtnTrash:= TButton.Create(LLayout);
+  LBtnTrash.StyleLookup := 'trashtoolbutton';
+  LBtnTrash.Anchors := [TAnchorKind.akTop, TAnchorKind.akRight, TAnchorKind.akBottom];
+  LBtnTrash.Align := TAlignLayout.Right;
+  LBtnTrash.ControlType := TControlType.Styled;
+  LBtnTrash.Size.Height := 35;
+  LBtnTrash.Size.PlatformDefault := False;
+  LBtnTrash.Size.Width := 35;
+  LBtnTrash.OnClick := DoTrashButtonClick;
+  LBtnTrash.Tag := index;
+  LBtnTrash.TagString := AId;
+  LLayout.AddObject(LBtnTrash);
+  // reboot instance
+  LBtnReboot:= TButton.Create(LLayout);
+  LBtnReboot.StyleLookup := 'refreshtoolbutton';
+  LBtnReboot.Anchors := [TAnchorKind.akTop, TAnchorKind.akRight, TAnchorKind.akBottom];
+  LBtnReboot.Align := TAlignLayout.Right;
+  LBtnReboot.ControlType := TControlType.Styled;
+  LBtnReboot.Size.Height := 35;
+  LBtnReboot.Size.PlatformDefault := False;
+  LBtnReboot.Size.Width := 35;
+  LBtnReboot.OnClick := DoRebootButtonClick;
+  LBtnReboot.Tag := index;
+  LBtnReboot.TagString := AId;
+  LLayout.AddObject(LBtnReboot);
+  // start instance
+  LBtnStart:= TButton.Create(LLayout);
+  LBtnStart.StyleLookup := 'playtoolbutton';
+  LBtnStart.Anchors := [TAnchorKind.akTop, TAnchorKind.akRight, TAnchorKind.akBottom];
+  LBtnStart.Align := TAlignLayout.Right;
+  LBtnStart.ControlType := TControlType.Styled;
+  LBtnStart.Size.Height := 35;
+  LBtnStart.Size.PlatformDefault := False;
+  LBtnStart.Size.Width := 35;
+  LBtnStart.OnClick := DoStartButtonClick;
+  LBtnStart.Tag := index;
+  LBtnStart.TagString := AId;
+  LLayout.AddObject(LBtnStart);
+  // reinstall instance
+  LBtnReinstall:= TButton.Create(LLayout);
+  LBtnReinstall.StyleLookup := 'replytoolbutton';
+  LBtnReinstall.Anchors := [TAnchorKind.akTop, TAnchorKind.akRight, TAnchorKind.akBottom];
+  LBtnReinstall.Align := TAlignLayout.Right;
+  LBtnReinstall.ControlType := TControlType.Styled;
+  LBtnReinstall.Size.Height := 35;
+  LBtnReinstall.Size.PlatformDefault := False;
+  LBtnReinstall.Size.Width := 35;
+  LBtnReinstall.OnClick := DoReinstallButtonClick;
+  LBtnReinstall.Tag := index;
+  LBtnReinstall.TagString := AId;
+  LLayout.AddObject(LBtnReinstall);
+  LDroplLabel := TLabel.Create(LLayout);
+  LDroplLabel.Align := TAlignLayout.Client;
+  LDroplLabel.Text := AName;
+  LLayout.AddObject(LDroplLabel);
+  Result.AddObject(LLayout);
 end;
 
 procedure TForm2.DeleteInstance(AnInstanceID: string; AItemIndex: integer);
@@ -158,6 +202,21 @@ begin
     LRestRequest.Free;
     LRestClient.Free;
   end;
+end;
+
+procedure TForm2.DoRebootButtonClick(Sender: TObject);
+begin
+  InstanceCommand((Sender as TButton).TagString, 'reboot');
+end;
+
+procedure TForm2.DoReinstallButtonClick(Sender: TObject);
+begin
+  InstanceCommand((Sender as TButton).TagString, 'reinstall');
+end;
+
+procedure TForm2.DoStartButtonClick(Sender: TObject);
+begin
+  InstanceCommand((Sender as TButton).TagString, 'start');
 end;
 
 procedure TForm2.DoTrashButtonClick(Sender: TObject);
@@ -208,30 +267,25 @@ begin
   end;
 end;
 
-function TForm2.InstanceCommand(AnInstanceID, ACommand: string): boolean;
+function TForm2.InstanceCommand(AnInstanceID, ACommand: string; AData: TJSONObject = nil): boolean;
 var
   LRestClient: TRESTClient;
   LRestRequest: TRESTRequest;
-  LReqBody, LResp: TJSONObject;
-  LItemLB: TListBoxItem;
 begin
+  Result := False;
   LRestClient := TRESTClient.Create(VULTR_API_BASE_PATH + '/instances/'+AnInstanceID+'/'+ACommand);
   LRestRequest:= TRESTRequest.Create(nil);
-  LReqBody :=  TJSONObject.Create;
   try
     LRestRequest.Method := rmPOST;
     LRestRequest.AddParameter('Authorization', 'Bearer ' + PersonalAccessToken, TRESTRequestParameterKind.pkHTTPHEADER, [poDoNotEncode]);
-    LRestRequest.AddBody(LReqBody.ToJSON, TRESTContentType.ctAPPLICATION_JSON);
+    if AData <> nil then
+      LRestRequest.AddBody(AData.ToJSON, TRESTContentType.ctAPPLICATION_JSON);
     LRestRequest.Client := LRestClient;
     LRestRequest.Execute;
-    LResp := (LRestRequest.Response.JSONValue as TJSONObject).GetValue('instance') as TJSONObject;
-    LItemLB := CreateListBoxItem(ListBox13.Count, LResp.GetValue('id').Value, LResp.GetValue('label').Value);
-    ListBox13.AddObject(LItemLB);
-    Result := LRestRequest.Response.JSONText;
+    Result := True;
   finally
     LRestRequest.Free;
     LRestClient.Free;
-    LReqBody.Free;
   end;
 end;
 
