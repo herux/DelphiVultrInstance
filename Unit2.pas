@@ -89,7 +89,6 @@ begin
     LReqBody.AddPair('plan','vc2-6c-16gb');
     LReqBody.AddPair('label','VULTR.Delphi'+ListBox13.Count.ToString+'.Instance');
     LReqBody.AddPair('os_id', TJSONNumber.Create(215));
-    LReqBody.AddPair('user_data','QmFzZTY0IEV4YW1wbGUgRGF0YQ');
     LReqBody.AddPair('backups','enabled');
 
     LRestRequest.Method := rmPOST;
